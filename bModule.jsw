@@ -1,0 +1,9 @@
+// Filename: backend/bModule.jsw (web modules need to have a .jsw extension)
+import {fetch} from 'wix-fetch';
+
+export function FetchAccessToken(access_code) {
+
+  return fetch('https://auth.band.us/oauth2/token?grant_type=authorization_code&code=' + access_code, 
+  {method: 'get', headers: {Authorization: "Basic MjgyNjU4MzAwOnRqMW5SSFRnNFhlTDdqeWhTMi1iRGRuR3dKWWFiek5M"}})
+    .then(response => response.json());
+}
