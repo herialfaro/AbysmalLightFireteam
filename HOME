@@ -1,0 +1,399 @@
+// For full API documentation, including code examples, visit http://wix.to/94BuAAs
+import wixData from 'wix-data';
+import wixWindow from 'wix-window';
+import wixLocation from 'wix-location';
+import wixUsers from 'wix-users';
+
+import {FetchAccessToken} from 'backend/bModule';
+import {FetchUserProfile} from 'backend/aModule';
+import {FetchBandId} from 'backend/cModule';
+import {FetchBandPost} from 'backend/dModule';
+
+let rowData = "";
+let rowData1 = "";
+
+//BAND INFORMATION
+let owner_id = "default";
+let access_token = "default";
+let user_name = "default";
+let bandid = "default";
+let band_postid = "default";
+
+let authorization_code = "default";
+
+//WIX MEMBER INFORMATION
+let fireteamID = "";
+let playerID = "";
+let member_id = "";
+let user;
+
+let maxnumplayers;
+
+let object_id;
+
+$w.onReady(async function () {
+	//TODO: write your page related code here...
+
+	user = wixUsers.currentUser;
+  member_id = user.id;
+	
+wixData.query("Miembro")
+  .find()
+  .then( async(results) => {
+    if(results.items.length > 0) 
+		{
+			let memberfound = false;
+
+			for (var i = 0; i < results.items.length; i++) {
+				if (results.items[i]._owner === member_id)
+				{memberfound = true;
+				$w("#text28").text = results.items[i]._id;
+        break;
+        }
+			}
+
+			checkURLQuery();
+					AwaitAccessCode();
+
+			if(memberfound === false)
+			{
+			InsertMember();
+			await timeOut();
+			}
+			else
+			{
+				await timeOut();
+			}
+    }
+		else
+		{
+			checkURLQuery();
+					AwaitAccessCode();
+			InsertMember();
+			await timeOut();
+		}
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+$w("#dataset2").setFilter(wixData.filter().contains('owner_id', $w("#text28").text));
+
+/*await timeOut();
+if ($w("#text23").text === null || $w("#text23").text === undefined || $w("#text23").text === "")
+{
+	wixLocation.to("/");
+}*/
+
+console.log(owner_id);
+		console.log(access_token);
+
+});
+
+function AwaitAccessCode()
+{
+	FetchAccessToken(authorization_code)
+  .then(temp => {let test = temp;
+	$w("#text23").text = test.access_token;
+	$w("#text24").text = test.user_key;});
+}
+
+function AwaitUserName()
+{
+	FetchUserProfile(access_token)
+	.then(temp => {let test = temp;
+	$w("#text25").text = test.result_data.name;});
+}
+
+function AwaitBandId()
+{
+	FetchBandId(access_token)
+	.then(temp => {let test = temp;
+	console.log(temp);
+	for (var i = 0; i < test.result_data.bands.length; i++) {
+		if(test.result_data.bands[i].name === "Abysmal Light LFG")
+		{
+			$w("#text26").text = test.result_data.bands[i].band_key;
+			break;
+		}
+	}
+	});
+}
+
+function checkURLQuery()
+{
+	let query = wixLocation.query;
+	let auth_code = query.code;
+	let auth_error = query.error;
+
+	if (auth_code === undefined)
+	{	
+		if(auth_error === undefined)
+		{
+			BANDSign();
+		}
+		else
+		{
+			wixLocation.to('/failauth');
+		}
+	}
+	else
+	{
+		authorization_code = auth_code;
+		if ($w("#text23").text === "-" || $w("#text23").text === "")
+{
+	wixLocation.to("/");
+}
+	}
+
+}
+
+function InsertMember ()
+{
+	let ToInsertMember = {
+			"test": "test"
+		}
+		wixData.insert("Miembro",ToInsertMember)
+    .then( (results) => {
+    let item = results; //see item below
+		object_id = item._id;
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+}
+
+function InsertPlayer ()
+{
+let ToInsertPlayer = {
+			"gamertag" : user_name,
+			"owner_id" : owner_id,
+			"personaje": $w('#dropdown2').value,
+			"nivel" : $w('#input2').value
+		}
+
+		wixData.insert("Player", ToInsertPlayer)
+    .then( (results) => {
+    let item = results; //see item below
+		playerID = results._id;
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+}
+
+function InsertFireteam ()
+{
+let ToInsertFireteam = {
+		"activity": $w('#dropdown1').value,
+		"numplayers": 1,
+		"isfull": false,
+		"mic_needed": $w('#switch1').checked,
+		"publishonband" : $w('#switch2').checked,
+		"bandpostid" : band_postid,
+		"maxnumplayers" : maxnumplayers,
+		"owner_id" : owner_id,
+		"p1_id" : playerID,
+		"p2_id" : "",
+		"p3_id" : "",
+		"p4_id" : "",
+		"p5_id" : "",
+		"p6_id" : "",
+		}
+
+		wixData.insert("Escuadra", ToInsertFireteam)
+  .then( (results) => {
+    let item = results; //see item below
+		fireteamID = results._id;
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+}
+
+function InsertPlayerReference()
+{
+	wixData.insertReference("Miembro", "mispersonajes", object_id, playerID)
+  .then( () => {
+    console.log("Reference inserted");
+  } )
+  .catch( (error) => {
+    console.log(error);
+  } );
+}
+
+function InsertMYFireteamReference()
+{
+	wixData.insertReference("Miembro", "misescuadras", object_id, fireteamID)
+  .then( () => {
+    console.log("Reference inserted");
+  } )
+  .catch( (error) => {
+    console.log(error);
+  } );
+}
+
+export async function button2_click(event) {
+	//Add your code for this event here: 
+	if ($w("#text23").text === "")
+{
+	wixWindow.openLightbox("Auth code fail");
+}
+else
+{
+
+if ((($w('#dropdown1').value === "")||($w('#dropdown2').value === "")||($w('#input2').value === "")) || ($w('#input2').valid === false || $w('#input2').value === undefined)) {
+		wixWindow.openLightbox("Warning1");
+
+	} else {
+		owner_id = $w("#text24").text;
+		access_token = $w("#text23").text;
+		AwaitUserName();
+		AwaitBandId();
+		
+		if($w('#dropdown1').value === "Ocaso" || $w('#dropdown1').value === "Ocaso 750" || $w('#dropdown1').value === "Ocaso 920" || $w('#dropdown1').value === "Ocaso 950" ||
+		$w('#dropdown1').value === "Ocaso 980" || $w('#dropdown1').value === "La Decisión" || $w('#dropdown1').value === "Forjas" || $w('#dropdown1').value === "Competitivo")
+		{
+			maxnumplayers = 3;
+		}
+		else if ($w('#dropdown1').value === "Gambito" || $w('#dropdown1').value === "Gambito Supremo") {
+			maxnumplayers = 4;
+		}
+		else if ($w('#dropdown1').value === "Crisol Dobles") {
+			maxnumplayers = 2;
+		}
+		else
+		{
+			maxnumplayers = 6;
+		}
+
+		wixWindow.openLightbox("Cargando");
+
+		await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+		InsertPlayer();
+		await timeOut();
+		InsertFireteam();
+		await timeOut();
+		InsertMYFireteamReference();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+		//BAND COMMENT HERE
+    if($w('#switch2').checked)
+    {
+
+      BANDPost();
+			await timeOut();
+			band_postid = $w("#text27").text;
+			wixData.get("Escuadra", fireteamID)
+  .then( (item) => {
+    item.bandpostid = band_postid; // updated last name
+    wixData.update("Escuadra", item);
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+    }
+
+		wixLocation.to("/escuadra/" + fireteamID);
+	}
+
+}
+}
+
+
+export function button3_click(event) {
+	//Add your code for this event here: 
+	if (rowData === "")
+	{
+		wixWindow.openLightbox("Warning1");
+	}
+	else
+	{
+		wixLocation.to("/escuadra/" + rowData);
+	}
+}
+
+export function table1_rowSelect(event) {
+	//Add your code for this event here: 
+	rowData = event.rowData._id;
+}
+
+function BANDSign()
+{
+	wixLocation.to('https://auth.band.us/oauth2/authorize?response_type=code&client_id=282658300&redirect_uri=https://heribertoalfarobar.wixsite.com/abysmallightfireteam');
+}
+
+function BANDPost()
+{
+	let baseURL = wixLocation.baseUrl;
+	let fullURL = baseURL + "/escuadra/" + fireteamID;
+	let micneeded;
+	let guides = "";
+
+	if($w('#switch1').checked)
+	{
+		micneeded = ".\n Se requiere microfono";
+	}
+	else
+	{
+		micneeded = ".\n No se requiere microfono";
+	}
+
+	if($w('#dropdown1').value === "Leviatán Normal" || $w('#dropdown1').value === "Leviatán Prestigio")
+	{
+		guides = "Guia en BAND de esta raid: https://band.us/band/72542650/post/193";
+	}
+	else if ($w('#dropdown1').value === "Espira de las Estrellas Normal" || $w('#dropdown1').value === "Espira de las Estrellas Prestigio")
+	{
+		guides = "Guia en BAND de esta raid: https://band.us/band/72542650/post/493";
+	}
+	else if ($w('#dropdown1').value === "Devorador de Mundos Normal" || $w('#dropdown1').value === "Devorador de Mundos Prestigio")
+	{
+		guides = "Guia en BAND de esta raid: https://band.us/band/72542650/post/492";
+	}
+	else if ($w('#dropdown1').value === "Último Deseo")
+	{
+		guides = "Guia en BAND de esta raid: https://band.us/band/72542650/post/205";
+	}
+	
+	let content = "Busco escuadra para "+ $w('#dropdown1').value + ".\n Soy " + $w('#dropdown2').value + " " + 
+	$w('#input2').value + micneeded + ".\n Unete a mi escuadra a traves de la siguiente liga: " + fullURL + "\n"
+	+ guides;
+
+	console.log(content);
+	console.log(access_token);
+	console.log(bandid);
+
+	FetchBandPost(access_token,bandid,content)
+	.then(temp => {let test = temp;
+	$w("#text27").text = test.result_data.post_key});
+}
+
+function timeOut() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, 3000);
+  });
+}
+
+export function button4_click(event) {
+	//Add your code for this event here: 
+	if (rowData1 === "")
+	{
+		wixWindow.openLightbox("Warning1");
+	}
+	else
+	{
+		wixLocation.to("/escuadra/" + rowData1);
+	}
+}
+
+export function table2_rowSelect(event) {
+	//Add your code for this event here: 
+	rowData1 = event.rowData._id;
+}
