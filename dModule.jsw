@@ -1,0 +1,11 @@
+// Filename: backend/dModule.jsw (web modules need to have a .jsw extension)
+
+import {fetch} from 'wix-fetch';
+
+export function FetchBandPost(access_token,band_key,content) {
+	console.log("checkpoint");
+	return fetch('https://openapi.band.us/v2.2/band/post/create?access_token=' + access_token + '&band_key=' + band_key
+	+ '&content=' + content + '&do_push=' + true, 
+  {method: 'post'})
+    .then(response => response.json());
+}
