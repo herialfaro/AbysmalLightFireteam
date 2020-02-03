@@ -1,0 +1,862 @@
+// For full API documentation, including code examples, visit http://wix.to/94BuAAs
+import wixData from 'wix-data';
+import wixWindow from 'wix-window';
+import wixLocation from 'wix-location';
+import wixUsers from 'wix-users';
+
+import {FetchAccessToken} from 'backend/bModule';
+import {FetchUserProfile} from 'backend/aModule';
+import {FetchBandId} from 'backend/cModule';
+import {FetchBandComment} from 'backend/eModule';
+
+//BAND INFORMATION
+let owner_id = "default";
+let access_token = "default";
+let user_name = "default";
+let bandid = "default";
+let band_postid = "default";
+
+let authorization_code = "default";
+
+//WIX MEMBER INFORMATION
+let fireteamID = "";
+let playerID = "";
+let member_id = "";
+let user;
+
+let object_id;
+
+$w.onReady(async function () {
+	//TODO: write your page related code here...
+  let numplayers;
+	await timeOut();
+
+  user = wixUsers.currentUser;
+  member_id = user.id;
+
+  //OAUTH BAND FUNCTION HERE
+
+wixData.query("Miembro")
+  .find()
+  .then( async(results) => {
+    if(results.items.length > 0) 
+		{
+			let memberfound = false;
+
+			for (var i = 0; i < results.items.length; i++) {
+				if (results.items[i]._owner === member_id)
+				{memberfound = true;
+				$w("#text28").text = results.items[i]._id;
+        break;
+        }
+			}
+
+			checkURLQuery();
+					AwaitAccessCode();
+
+			if(memberfound === false)
+			{
+			InsertMember();
+      await timeOut();
+			}
+			else
+			{
+				await timeOut();
+			}
+    }
+		else
+		{
+			checkURLQuery();
+					AwaitAccessCode();
+			InsertMember();
+      await timeOut();
+		}
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+
+numplayers = $w("#progressBar1").value;
+  fireteamID = $w("#text15").text;
+  
+  UpdateTable();
+});
+
+function UpdateTable()
+{
+  //UPDATE TABLE WITH PLAYERS FUNCTION
+  wixData.get("Escuadra", fireteamID)
+  .then( async(results) => {
+    let thisfireteam = results; //see item below
+    let this_P1ID = thisfireteam.p1_id;
+    let this_P2ID = thisfireteam.p2_id;
+    let this_P3ID = thisfireteam.p3_id;
+    let this_P4ID = thisfireteam.p4_id;
+    let this_P5ID = thisfireteam.p5_id;
+    let this_P6ID = thisfireteam.p6_id;
+
+    let item1 = "";
+    let item2 = "";
+    let item3 = "";
+    let item4 = "";
+    let item5 = "";
+    let item6 = "";
+    let myTableData;
+
+    //FETCH PLAYER1
+    wixData.get("Player", this_P1ID)
+  .then( (PLAYER1) => {
+    item1 = PLAYER1; //see item below
+
+//FETCH PLAYER2
+
+ wixData.get("Player", this_P2ID)
+  .then( (PLAYER2) => {
+    item2 = PLAYER2; //see item below
+
+    if(item2 === null)
+    {
+      myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel}
+];
+    }
+    else
+    {
+
+      //FETCH PLAYER3
+
+     wixData.get("Player", this_P3ID)
+  .then( (PLAYER3) => {
+    item3 = PLAYER3; //see item below
+
+    if (item3 === null)
+    {
+      myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel},
+  {"gamertag": item2.gamertag, "personaje": item2.personaje, "nivel": item2.nivel}
+];
+
+    }
+    else
+    {
+
+      //FETCH PLAYER4
+
+wixData.get("Player", this_P4ID)
+  .then( (PLAYER4) => {
+    item4 = PLAYER4; //see item below
+
+if(item4 === null)
+{
+  myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel},
+  {"gamertag": item2.gamertag, "personaje": item2.personaje, "nivel": item2.nivel},
+  {"gamertag": item3.gamertag, "personaje": item3.personaje, "nivel": item3.nivel}
+];
+}
+else
+{
+
+  //FETCH PLAYER5
+
+wixData.get("Player", this_P5ID)
+  .then( (PLAYER5) => {
+    item5 = PLAYER5; //see item below
+
+    if(item5 === null)
+    {
+      myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel},
+  {"gamertag": item2.gamertag, "personaje": item2.personaje, "nivel": item2.nivel},
+  {"gamertag": item3.gamertag, "personaje": item3.personaje, "nivel": item3.nivel},
+  {"gamertag": item4.gamertag, "personaje": item4.personaje, "nivel": item4.nivel}
+];
+
+    }
+    else
+    {
+
+      //FETCH PLAYER6
+
+wixData.get("Player", this_P6ID)
+  .then( (PLAYER6) => {
+    item6 = PLAYER6; //see item below
+
+    if (item6 === null)
+    {
+
+      //UPDATE TABLE
+    myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel},
+  {"gamertag": item2.gamertag, "personaje": item2.personaje, "nivel": item2.nivel},
+  {"gamertag": item3.gamertag, "personaje": item3.personaje, "nivel": item3.nivel},
+  {"gamertag": item4.gamertag, "personaje": item4.personaje, "nivel": item4.nivel},
+  {"gamertag": item5.gamertag, "personaje": item5.personaje, "nivel": item5.nivel}
+];
+
+    }
+    else
+    {
+
+      //UPDATE TABLE
+    myTableData = [
+  {"gamertag": item1.gamertag, "personaje": item1.personaje, "nivel": item1.nivel},
+  {"gamertag": item2.gamertag, "personaje": item2.personaje, "nivel": item2.nivel},
+  {"gamertag": item3.gamertag, "personaje": item3.personaje, "nivel": item3.nivel},
+  {"gamertag": item4.gamertag, "personaje": item4.personaje, "nivel": item4.nivel},
+  {"gamertag": item5.gamertag, "personaje": item5.personaje, "nivel": item5.nivel},
+  {"gamertag": item6.gamertag, "personaje": item6.personaje, "nivel": item6.nivel},
+];
+
+    }
+
+
+    }).catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+    }
+
+
+}).catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+}
+
+}).catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+    }
+
+
+}).catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+
+    }
+
+  }).catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+
+  } ) .catch( (err) => {
+    let errorMsg = err;
+    console.log(errorMsg);
+  } );
+
+await timeOut();
+
+$w.onReady(function () {
+  $w("#table1").dataFetcher = getRows;
+});
+
+function getRows(startRow, endRow) {
+  return new Promise( (resolve, reject) => {
+    // Fetch the objects from startRow to endRow from `myTableData`:
+    const fetchedDataRows = myTableData.slice(startRow, endRow);
+    // resolve to DataRequested object
+    resolve( {
+      pageRows: fetchedDataRows,
+      totalRowsCount: myTableData.length
+    } );
+  } );
+}
+  } )
+}
+
+function AwaitAccessCode()
+{
+	FetchAccessToken(authorization_code)
+  .then(temp => {let test = temp;
+	$w("#text23").text = test.access_token;
+	$w("#text24").text = test.user_key;});
+}
+
+function AwaitUserName()
+{
+	FetchUserProfile($w("#text23").text,$w("#text24").text)
+	.then(temp => {let test = temp;
+	$w("#text25").text = test.result_data.name;});
+}
+
+function AwaitBandId()
+{
+	FetchBandId(access_token)
+	.then(temp => {let test = temp;
+	for (var i = 0; i < test.result_data.bands.length; i++) {
+		if(test.result_data.bands[i].name === "Abysmal Light LFG")
+		{
+			$w("#text26").text = test.result_data.bands[i].band_key;
+			break;
+		}
+	}
+	});
+}
+
+function checkURLQuery()
+{
+	let query = wixLocation.query;
+	let auth_code = query.code;
+	let auth_error = query.error;
+
+	if (auth_code === undefined)
+	{	
+		if(auth_error === undefined)
+		{
+			BANDSign();
+		}
+		else
+		{
+			wixLocation.to('/failauth');
+		}
+	}
+	else
+	{
+		authorization_code = auth_code;
+    if ($w("#text23").text === "-")
+{
+	wixLocation.to("/escuadra/" +fireteamID);
+}
+	}
+
+}
+
+function InsertMember ()
+{
+	let ToInsertMember = {
+			"test": "test"
+		}
+		wixData.insert("Miembro",ToInsertMember)
+    .then( (results) => {
+    let item = results; //see item below
+		object_id = item._id;
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+}
+
+function InsertPlayer ()
+{
+let ToInsertPlayer = {
+			"gamertag" : user_name,
+			"owner_id" : owner_id,
+			"personaje": $w('#dropdown2').value,
+			"nivel" : $w('#input2').value
+		}
+
+		wixData.insert("Player", ToInsertPlayer)
+    .then( (results) => {
+    let item = results; //see item below
+		playerID = results._id;
+  } )
+  .catch( (err) => {
+    let errorMsg = err;
+  } );
+}
+
+function InsertPlayerReference()
+{
+	wixData.insertReference("Miembro", "mispersonajes", object_id, playerID)
+  .then( () => {
+    console.log("Reference inserted");
+  } )
+  .catch( (error) => {
+    console.log(error);
+  } );
+}
+
+export async function join_click(event) {
+	//Add your code for this event here: 
+
+if ($w("#text23").text === "")
+{
+	wixWindow.openLightbox("Auth code fail");
+}
+else
+{
+
+if ((($w('#dropdown2').value === "")||($w('#input2').value === "")) || $w('#input2').valid === false)
+    {
+		wixWindow.openLightbox("Warning1");
+	} 
+  else {
+    console.log("Uniendose a escuadra");
+    owner_id = $w("#text24").text;
+		access_token = $w("#text23").text;
+    object_id = $w("#text28").text;
+		AwaitUserName();
+		AwaitBandId();
+    ////////////////////////////////////////////////////////////////
+    
+    wixData.get("Escuadra", fireteamID)
+  .then( async (results) => {
+    let item = results; //see item below
+
+    let FTOwner = item.owner_id;
+    let activity = item.activity;
+    let P1ID = item.p1_id;
+    let P2ID = item.p2_id;
+    let P3ID = item.p3_id;
+    let P4ID = item.p4_id;
+    let P5ID = item.p5_id;
+    let P6ID = item.p6_id;
+    let numplayers = item.numplayers;
+    let maxplayers = item.maxnumplayers;
+    let isfull = item.isfull;
+    let micneeded = item.mic_needed;
+    let publishonband = item.publishonband;
+    let bandpostid = item.bandpostid;
+
+    $w("#text27").text = bandpostid;
+    await timeOut();
+
+    if(FTOwner === owner_id)
+    {
+      wixWindow.openLightbox("FireteamAlreadyJoined");
+    }
+    else
+    {
+      if(isfull)
+      {
+        wixWindow.openLightbox("FireteamFull");
+      }
+      else
+      {
+        if(P2ID === "")
+      {
+        wixData.queryReferenced("Miembro", object_id, "mispersonajes")
+  .then(async (mycharacters) => {
+    
+        wixWindow.openLightbox("Cargando");
+
+        await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+    await timeOut();
+		user_name = $w("#text25").text;
+		InsertPlayer();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+    numplayers += 1;
+    if(numplayers === maxplayers)
+    {
+      isfull = true;
+    }
+
+        let toUpdateplayer2 = {
+  "owner_id": FTOwner,
+  "activity": activity,
+  "p1_id": P1ID,
+  "p3_id": P3ID,
+  "p4_id": P4ID,
+  "p5_id": P5ID,
+  "p6_id": P6ID,
+  "maxnumplayers": maxplayers,
+  "mic_needed" : micneeded,
+  "publishonband": publishonband,
+  "bandpostid": bandpostid,
+
+  "_id":          fireteamID,
+  "p2_id":        playerID,
+  "numplayers": numplayers,
+  "isfull": isfull
+    }
+
+    wixData.update("Escuadra", toUpdateplayer2);
+
+    wixWindow.openLightbox("JoinedFireteamSuccessful");
+
+    await timeOut();
+
+    //BAND COMMENT HERE
+    if(publishonband === true)
+    {
+      BANDComment();
+    }
+
+      wixLocation.to("/home");
+  } )
+        
+      }
+      else
+      {
+         if(P3ID === "")
+      {
+        let playerfound = false;
+        wixData.queryReferenced("Miembro", object_id, "mispersonajes")
+  .then(async (mycharacters) => {
+    if(mycharacters.items.length > 0) {
+      for (var i = 0; i < mycharacters.items.length; i++) {
+        if(mycharacters.items[i]._id === P2ID)
+        {
+          playerfound = true;
+          break;
+        }
+      }
+    }
+      if(playerfound === true)
+      {
+        wixWindow.openLightbox("FireteamAlreadyJoined");
+      }
+      else
+      {
+        wixWindow.openLightbox("Cargando");
+
+        await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+    await timeOut();
+		user_name = $w("#text25").text;
+		InsertPlayer();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+    numplayers += 1;
+    if(numplayers === maxplayers)
+    {
+      isfull = true;
+    }
+
+        let toUpdateplayer3 = {
+  "owner_id": FTOwner,
+  "activity": activity,
+  "p1_id": P1ID,
+  "p2_id": P2ID,
+  "p4_id": P4ID,
+  "p5_id": P5ID,
+  "p6_id": P6ID,
+  "maxnumplayers": maxplayers,
+  "mic_needed" : micneeded,
+  "publishonband": publishonband,
+  "bandpostid": bandpostid,
+
+  "_id":          fireteamID,
+  "p3_id":        playerID,
+  "numplayers": numplayers,
+  "isfull": isfull
+    }
+
+    wixData.update("Escuadra", toUpdateplayer3);
+
+    wixWindow.openLightbox("JoinedFireteamSuccessful");
+
+    await timeOut();
+
+    //BAND COMMENT HERE
+    if(publishonband === true)
+    {
+      BANDComment();
+    }
+
+      wixLocation.to("/home");
+      }
+  } )
+
+      }
+      else
+      {
+         if(P4ID === "")
+      {
+        let playerfound = false;
+        wixData.queryReferenced("Miembro", object_id, "mispersonajes")
+  .then(async (mycharacters) => {
+    if(mycharacters.items.length > 0) {
+      for (var i = 0; i < mycharacters.items.length; i++) {
+        if(mycharacters.items[i]._id === P2ID || mycharacters.items[i]._id === P3ID)
+        {
+          playerfound = true;
+          break;
+        }
+      }
+    }
+      if(playerfound === true)
+      {
+        wixWindow.openLightbox("FireteamAlreadyJoined");
+      }
+      else
+      {
+        wixWindow.openLightbox("Cargando");
+
+        await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+    await timeOut();
+		user_name = $w("#text25").text;
+		InsertPlayer();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+    numplayers += 1;
+    if(numplayers === maxplayers)
+    {
+      isfull = true;
+    }
+
+        let toUpdateplayer4 = {
+  "owner_id": FTOwner,
+  "activity": activity,
+  "p1_id": P1ID,
+  "p2_id": P2ID,
+  "p3_id": P3ID,
+  "p5_id": P5ID,
+  "p6_id": P6ID,
+  "maxnumplayers": maxplayers,
+  "mic_needed" : micneeded,
+  "publishonband": publishonband,
+  "bandpostid": bandpostid,
+
+  "_id":          fireteamID,
+  "p4_id":        playerID,
+  "numplayers": numplayers,
+  "isfull": isfull
+    }
+
+    wixData.update("Escuadra", toUpdateplayer4);
+
+    wixWindow.openLightbox("JoinedFireteamSuccessful");
+
+    await timeOut();
+
+    //BAND COMMENT HERE
+    if(publishonband === true)
+    {
+      BANDComment();
+    }
+
+      wixLocation.to("/home");
+      }
+  } )
+      }
+      else
+      {
+         if(P5ID === "")
+      {
+        let playerfound = false;
+        wixData.queryReferenced("Miembro", object_id, "mispersonajes")
+  .then(async (mycharacters) => {
+    if(mycharacters.items.length > 0) {
+      for (var i = 0; i < mycharacters.items.length; i++) {
+        if(mycharacters.items[i]._id === P2ID || mycharacters.items[i]._id === P3ID || mycharacters.items[i]._id === P4ID)
+        {
+          playerfound = true;
+          break;
+        }
+      }
+    }
+      if(playerfound === true)
+      {
+        wixWindow.openLightbox("FireteamAlreadyJoined");
+      }
+      else
+      {
+        wixWindow.openLightbox("Cargando");
+
+        await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+    await timeOut();
+		user_name = $w("#text25").text;
+		InsertPlayer();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+    numplayers += 1;
+    if(numplayers === maxplayers)
+    {
+      isfull = true;
+    }
+
+        let toUpdateplayer5 = {
+  "owner_id": FTOwner,
+  "activity": activity,
+  "p1_id": P1ID,
+  "p2_id": P2ID,
+  "p3_id": P3ID,
+  "p4_id": P4ID,
+  "p6_id": P6ID,
+  "maxnumplayers": maxplayers,
+  "mic_needed" : micneeded,
+  "publishonband": publishonband,
+  "bandpostid": bandpostid,
+
+  "_id":          fireteamID,
+  "p5_id":        playerID,
+  "numplayers": numplayers,
+  "isfull": isfull
+    }
+
+    wixData.update("Escuadra", toUpdateplayer5);
+
+    wixWindow.openLightbox("JoinedFireteamSuccessful");
+
+    await timeOut();
+
+    //BAND COMMENT HERE
+    if(publishonband === true)
+    {
+      BANDComment();
+    }
+
+      wixLocation.to("/home");
+      }
+  } )
+      }
+      else
+      {
+         if(P6ID === "")
+      {
+        let playerfound = false;
+        wixData.queryReferenced("Miembro", object_id, "mispersonajes")
+  .then(async (mycharacters) => {
+    if(mycharacters.items.length > 0) {
+      for (var i = 0; i < mycharacters.items.length; i++) {
+        if(mycharacters.items[i]._id === P2ID || mycharacters.items[i]._id === P3ID || mycharacters.items[i]._id === P4ID ||
+           mycharacters.items[i]._id === P5ID)
+        {
+          playerfound = true;
+          break;
+        }
+      }
+    }
+      if(playerfound === true)
+      {
+        wixWindow.openLightbox("FireteamAlreadyJoined");
+      }
+      else
+      {
+        wixWindow.openLightbox("Cargando");
+
+        await timeOut();
+		user_name = $w("#text25").text;
+		bandid = $w("#text26").text;
+
+    await timeOut();
+		user_name = $w("#text25").text;
+		InsertPlayer();
+		await timeOut();
+		InsertPlayerReference();
+		await timeOut();
+
+    numplayers += 1;
+    if(numplayers === maxplayers)
+    {
+      isfull = true;
+    }
+
+        let toUpdateplayer5 = {
+  "owner_id": FTOwner,
+  "activity": activity,
+  "p1_id": P1ID,
+  "p2_id": P2ID,
+  "p3_id": P3ID,
+  "p4_id": P4ID,
+  "p5_id": P5ID,
+  "maxnumplayers": maxplayers,
+  "mic_needed" : micneeded,
+  "publishonband": publishonband,
+  "bandpostid": bandpostid,
+
+  "_id":          fireteamID,
+  "p6_id":        playerID,
+  "numplayers": numplayers,
+  "isfull": isfull
+    }
+
+    wixData.update("Escuadra", toUpdateplayer5);
+
+    wixWindow.openLightbox("JoinedFireteamSuccessful");
+
+    await timeOut();
+
+    //BAND COMMENT HERE
+    if(publishonband === true)
+    {
+      BANDComment();
+    }
+
+      wixLocation.to("/home");
+      }
+  } )
+      }
+      else
+      {
+        wixWindow.openLightbox("FireteamFull");
+      }
+    }
+    }
+
+    }
+
+    }
+
+      }
+      
+    }
+
+   
+})
+  }
+
+}
+}
+
+function BANDSign()
+{
+  wixLocation.to('https://auth.band.us/oauth2/authorize?response_type=code&client_id=282658300&redirect_uri=https://heribertoalfarobar.wixsite.com/abysmallightfireteam/escuadra/' + fireteamID);
+}
+
+function BANDComment()
+{
+	let body = "Me uni a tu escuadra. Soy " + $w('#dropdown2').value + " " + 
+	$w('#input2').value;
+  band_postid = $w("#text27").text;
+  console.log(band_postid);
+
+	FetchBandComment(access_token,bandid,band_postid, body)
+	.then(temp => {let test = temp;});
+}
+
+function timeOut() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, 2000);
+  });
+}
+
+export function delete_click(event) {
+	//Add your code for this event here: 
+
+  wixData.get("Escuadra", fireteamID)
+  .then( async (results) => {
+    let item = results; //see item below
+    if(item.owner_id === owner_id)
+    {
+      //DELETE FIRETEAM LIGHTBOX
+    }
+    else
+    {
+      wixWindow.openLightbox("NotFireteamLeader");
+    }
+  })
+
+}
