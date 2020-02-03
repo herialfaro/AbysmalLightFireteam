@@ -1,0 +1,10 @@
+// Filename: backend/cModule.jsw (web modules need to have a .jsw extension)
+
+import {fetch} from 'wix-fetch';
+
+export function FetchBandId(access_token) {
+
+	return fetch('https://openapi.band.us/v2.1/bands?access_token=' + access_token, 
+  {method: 'get'})
+    .then(response => response.json());
+}
