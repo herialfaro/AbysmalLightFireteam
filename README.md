@@ -18,7 +18,7 @@ chat, make posts and comments to interact with other members
 of the same group (usually referred to as BANDs).
 
 Abysmal Light is a small community of gamers that revolve around
-mainly on the game Destiny 2, developed by Bungie.
+the game Destiny 2, developed by Bungie.
 This group uses BAND as its main form of communication,
 that's why this tool was designed to be able to connect with
 the BAND API.
