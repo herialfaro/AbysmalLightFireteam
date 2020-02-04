@@ -1,4 +1,14 @@
+// This is the front-end code for the HOME page.
+// This is where users are able to create and find fireteams.
+// When a fireteam is created it sends a request to the BAND API
+// to write a post on the user's behalf, informing
+// other members of the same group that a fireteam
+// has been created.
+
+// It connects to the a, b, c, and d modules.
+
 // For full API documentation, including code examples, visit http://wix.to/94BuAAs
+
 import wixData from 'wix-data';
 import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
