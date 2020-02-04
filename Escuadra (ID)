@@ -1,3 +1,10 @@
+// This is the front-end code for a dynamic page.
+// Dynamic pages are unique and display specific information
+// about each individual fireteam created (including activity 
+// and players).
+
+// It connects to the a, b, c, and e modules.
+
 // For full API documentation, including code examples, visit http://wix.to/94BuAAs
 
 import wixData from 'wix-data';
