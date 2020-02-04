@@ -6,6 +6,8 @@ Note: A local account and a BAND account are required
 to identify each individual member, therefore, they are needed
 for the user to be able to use the page as intended.
 
+Video demonstration: https://youtu.be/yZo1gcBIMOY
+
 Abysmal Light Fireteams is a web page created using Wix.com
 
 This web page connects to the BAND Open API 
