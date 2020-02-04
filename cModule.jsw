@@ -1,3 +1,9 @@
+// This is the cModule, a back-end script.
+// This module sends a request to the BAND API
+// providing a user's access token
+// needed to finalize the authorization process
+// required by the BAND API
+
 // Filename: backend/cModule.jsw (web modules need to have a .jsw extension)
 
 import {fetch} from 'wix-fetch';
