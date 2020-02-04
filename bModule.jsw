@@ -1,4 +1,10 @@
+// This is the bModule, a back-end script.
+// This module sends a request to the BAND API
+// providing a user's access code
+// needed to authorize access to the user's BAND account
+
 // Filename: backend/bModule.jsw (web modules need to have a .jsw extension)
+
 import {fetch} from 'wix-fetch';
 
 export function FetchAccessToken(access_code) {
