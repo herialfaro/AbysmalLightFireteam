@@ -1,3 +1,8 @@
+// This is the eModule, a back-end script.
+// This module sends a request to the BAND API
+// providing the user's access token, band key, post key and content
+// needed to write a comment on the user's behalf
+
 // Filename: backend/eModule.jsw (web modules need to have a .jsw extension)
 
 import {fetch} from 'wix-fetch';
