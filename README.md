@@ -35,3 +35,9 @@ group of players interested in completing a specific activity together.
 
 ° Activity: This could be a player vs player match or a story mission
 in the game.
+
+#What I learned
+
+° Write code in Javascript
+° Perform requests to an API using JSON format
+° Web design basics
