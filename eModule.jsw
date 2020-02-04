@@ -1,0 +1,11 @@
+// Filename: backend/eModule.jsw (web modules need to have a .jsw extension)
+
+import {fetch} from 'wix-fetch';
+
+export function FetchBandComment(access_token,band_key,post_key,body) {
+	console.log("checkpoint");
+	return fetch('https://openapi.band.us/v2/band/post/comment/create?access_token=' + access_token + '&band_key=' + band_key
+	+ '&post_key=' + post_key + '&body=' + body, 
+  {method: 'post'})
+    .then(response => response.json());
+}
