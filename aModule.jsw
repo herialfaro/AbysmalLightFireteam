@@ -1,4 +1,10 @@
+// This is the aModule, a back-end script.
+// This module sends a request to the BAND API
+// providing a user's access token.
+// It is needed to retrieve information about the BAND member
+
 // Filename: backend/aModule.jsw (web modules need to have a .jsw extension)
+
 import {fetch} from 'wix-fetch';
 
 export function FetchUserProfile(access_token) {
