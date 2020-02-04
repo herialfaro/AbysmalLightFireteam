@@ -39,5 +39,7 @@ in the game.
 # What I learned
 
 ° Write code in Javascript
+
 ° Perform requests to an API using JSON format
+
 ° Web design basics
