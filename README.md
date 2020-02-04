@@ -7,6 +7,7 @@ to identify each individual member, therefore, they are needed
 for the user to be able to use the page as intended.
 
 Abysmal Light Fireteams is a web page created using Wix.com
+
 This web page connects to the BAND Open API 
 (https://developers.band.us/) to write
 posts and comments on behalf of the user.
